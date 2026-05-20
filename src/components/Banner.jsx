@@ -19,7 +19,7 @@ const Banner = () => {
             
       
             <div className="relative z-10 p-1 md:p-5 flex justify-center items-center flex-col">
-                <h1 className="text-white text-5xl font-bold flex items-center gap-3">Online <span className='text-yellow-400'>Sport</span> booking <span className='text-[#810B38]'>app</span> <IoIosTrophy className='text-yellow-500'  /></h1>
+                <h1 className="text-white text-5xl font-bold flex items-center gap-3 flex-wrap">Online <span className='text-yellow-400'>Sport</span> booking <span className='text-[#810B38]'>app</span> <IoIosTrophy className='text-yellow-500'  /></h1>
                 <h2 className="text-white font-semibold text-xl mt-4 flex items-center gap-2"><FaStarHalfAlt  className='text-green-500'/> Cholo Kheli! Say yes to fitness and no to drugs. <br /> Book your favorite local sports  instantly.</h2>
                 <button className="mt-6">
                     <PlayNowButton />

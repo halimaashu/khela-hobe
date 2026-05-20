@@ -12,18 +12,21 @@ const NavBar = () => {
         Khela <span className="text-[#810B38]">Hobe</span>
       </h1>
       </div>
-      <ul className="flex items-center gap-3 font-semibold">
+      <ul className=" items-center gap-3 font-semibold hidden md:flex">
         <li>
           <Link href="/">Home</Link>
         </li>
         <li>
-          <Link href="/">All features</Link>
+          <Link href="/all-facility">All Facility</Link>
         </li>
         <li>
-          <Link href="/">bookings</Link>
+          <Link href="/add-facility">Add Facility</Link>
+        </li>
+        <li>
+          <Link href="/bookings">bookings</Link>
         </li>
       </ul>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 hidden">
         <Avatar>
           <Avatar.Image
             alt="John Doe"
@@ -48,6 +51,9 @@ const NavBar = () => {
           </ul>
         </div>
         
+      </div>
+      <div className="">
+        <h1>login</h1>
       </div>
     </nav>
   );

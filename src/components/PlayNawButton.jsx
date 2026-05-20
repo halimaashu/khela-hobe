@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import styled from 'styled-components';
 
@@ -5,7 +6,7 @@ const PlayNowButton = () => {
   return (
     <StyledWrapper>
       <button>
-        <span className='text-xl font-bold text-white'>PLAY NOW</span>
+        <span >PLAY NOW</span>
       </button>
     </StyledWrapper>
   );

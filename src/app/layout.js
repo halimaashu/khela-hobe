@@ -26,7 +26,11 @@ export default function RootLayout({ children }) {
     >
       <body className={`min-h-full flex flex-col ${inter.className}`}>
         <NavBar/>
-        <main>{children}</main>
+        <main className="">
+         <div className="max-w-6xl mx-auto">
+           {children}
+         </div>
+        </main>
         <Footer/>
       </body>
     </html>

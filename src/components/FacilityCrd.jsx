@@ -5,6 +5,7 @@ import {
 } from "@gravity-ui/icons";
 import { Card } from "@heroui/react";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { CiLocationOn } from "react-icons/ci";
 
@@ -28,12 +29,12 @@ const FacilityCrd = ({ re }) => {
         <StarFill className="text-green-500" />{" "}
         <StarFill className="text-green-500" /> {re.facility_type}
       </h1>
-      <button className="text-[#541A1A] underline flex items-center gap-3">
+     <Link href={`/all-facility/${re._id}`}> <button className="text-[#541A1A] underline flex items-center gap-3">
         Book Now{" "}
         <span className="-rotate-45">
           <ArrowChevronRight fontSize={20} />
         </span>
-      </button>
+      </button></Link>
     </Card>
   );
 };

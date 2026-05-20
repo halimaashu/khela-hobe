@@ -1,4 +1,4 @@
-import { Avatar } from "@heroui/react";
+import { Avatar, Button } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -52,8 +52,13 @@ const NavBar = () => {
         </div>
         
       </div>
-      <div className="">
-        <h1>login</h1>
+      <div className="flex items-center gap-2">
+        <Link href="/login">
+          <Button variant="ghost">Login</Button>
+        </Link>
+        <Link href="/signup">
+          <Button className={"bg-[#810B38]"}>Sign Up</Button>
+        </Link>
       </div>
     </nav>
   );

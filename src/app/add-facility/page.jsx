@@ -13,32 +13,30 @@ import {
 } from "@heroui/react";
 import Image from "next/image";
 const AddFacilityPage = () => {
-  const onSubmit =async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-    // const data: Record<string, string> = {};
-    // // Convert FormData to plain object
-    // formData.forEach((value, key) => {
-    //   data[key] = value.toString();
-    // });
-    // alert(`Form submitted with: ${JSON.stringify(data, null, 2)}`);
 
-
-
-    const res=await fetch("http://localhost:5000/add-facility",{
-        method:"POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/add-facility`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
     console.log(data);
   };
 
   return (
     <div className="md:w-1/2 mx-auto p-5 shadow-lg">
-        <Image src={"/khela-hobe.png"} alt="Khela Hobe" width={100} height={100} className="mx-auto "/>
+      <Image
+        src={"/khela-hobe.png"}
+        alt="Khela Hobe"
+        width={100}
+        height={100}
+        className="mx-auto "
+      />
       <h1 className="text-2xl font-bold text-center text-[#810B38] mb-5">
         Add a new Facility
       </h1>

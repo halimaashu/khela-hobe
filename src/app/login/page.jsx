@@ -14,6 +14,7 @@ import {
 } from "@heroui/react";
 import Image from "next/image";
 import { DiGoogleDrive } from "react-icons/di";
+import { toast } from "react-toastify";
 const LogInPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -27,10 +28,10 @@ const LogInPage = () => {
       callbackURL: "/",
     });
     if (user) {
-      alert(`log in successful!well come MR.`);
+      toast.success(`log in successful!well come MR.`);
     }
     if (error) {
-      alert(`log in fail ${error.message}`);
+      toast.error(`log in fail ${error.message}`);
     }
   };
   const handelGoogleLogin = async () => {

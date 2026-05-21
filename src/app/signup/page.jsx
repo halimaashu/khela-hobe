@@ -15,26 +15,13 @@ import {
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { DiGoogleDrive } from "react-icons/di";
+import { toast } from "react-toastify";
 const SignUpPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-    // const data: Record<string, string> = {};
-    // // Convert FormData to plain object
-    // formData.forEach((value, key) => {
-    //   data[key] = value.toString();
-    // });
-    // alert(`Form submitted with: ${JSON.stringify(data, null, 2)}`);
-
-    // const res=await fetch("http://localhost:5000/add-facility",{
-    //     method:"POST",
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify(data)
-    // })
-    // console.log(data);
+   
     const { name, email, password, image } = data;
     const { data: user, error } = await authClient.signUp.email({
       name, // required
@@ -45,10 +32,10 @@ const SignUpPage = () => {
     });
 
     if (user) {
-      alert("sign up successful!");
+      toast.success("sign up successful!");
       redirect("/");
     } else {
-      alert(`sign up fail ${error.message}`);
+      toast.error(`sign up fail ${error.message}`);
     }
   };
   const handelGoogleLogin = async () => {

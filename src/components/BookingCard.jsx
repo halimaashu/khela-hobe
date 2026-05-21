@@ -3,6 +3,7 @@ import { authClient } from "@/lib/auth-client";
 import { Card ,Calendar, DateField, DatePicker, Label, Button} from "@heroui/react";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const BookingCard = ({data}) => {
     const [date,setDate]=useState(null);
@@ -29,7 +30,7 @@ const BookingCard = ({data}) => {
 
         const {data:tokenData}=await authClient.token();
         console.log(tokenData,"from booking data")
-        const res=await fetch("http://localhost:5000/booking", {
+        const res=await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/booking`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -38,7 +39,7 @@ const BookingCard = ({data}) => {
             body: JSON.stringify(bookingData)
         });
         const result=await res.json();
-        alert("booking success")
+        toast.success("booking success")
         redirect("/all-facility")
     }
 

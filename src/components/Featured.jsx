@@ -2,7 +2,7 @@ import React from "react";
 import FacilityCrd from "./FacilityCrd";
 import { MdFeaturedPlayList } from "react-icons/md";
 const Featured = async () => {
-  const res = await fetch("http://localhost:5000/featured");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/featured`);
   const data = await res.json();
   const result = data.slice(3, 10);
   console.log(result);

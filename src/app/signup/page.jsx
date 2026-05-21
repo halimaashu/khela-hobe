@@ -1,4 +1,5 @@
 "use client";
+import { authClient } from "@/lib/auth-client";
 import { Check } from "@gravity-ui/icons";
 import {
   Button,
@@ -12,6 +13,7 @@ import {
   ListBox,
 } from "@heroui/react";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { DiGoogleDrive } from "react-icons/di";
 const SignUpPage = () => {
   const onSubmit = async (e) => {
@@ -33,6 +35,27 @@ const SignUpPage = () => {
     //     body: JSON.stringify(data)
     // })
     // console.log(data);
+    const { name, email, password, image } = data;
+    const { data: user, error } = await authClient.signUp.email({
+      name, // required
+      email, // required
+      password, // required
+      image,
+      callbackURL: "/",
+    });
+
+    if (user) {
+      alert("sign up successful!");
+      redirect("/");
+    } else {
+      alert(`sign up fail ${error.message}`);
+    }
+  };
+  const handelGoogleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    });
   };
 
   return (
@@ -108,15 +131,20 @@ const SignUpPage = () => {
             <Check />
             SIgn Up
           </Button>
-          
         </div>
         <div className="flex justify-center items-center">
-            <div className="separet"></div>
-            <p>Or</p>
-            <div className="separet"></div>
+          <div className="separet"></div>
+          <p>Or</p>
+          <div className="separet"></div>
         </div>
         <div className="">
-            <Button variant="outline" className={"  w-full rounded-md flex place-items-center"}><DiGoogleDrive/> Sign Up with google</Button>
+          <Button
+            variant="outline"
+            className={"  w-full rounded-md flex place-items-center"}
+            onClick={handelGoogleLogin}
+          >
+            <DiGoogleDrive /> Sign Up with google
+          </Button>
         </div>
       </Form>
     </div>

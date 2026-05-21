@@ -1,4 +1,5 @@
 "use client";
+import { authClient } from "@/lib/auth-client";
 import { Check } from "@gravity-ui/icons";
 import {
   Button,
@@ -18,21 +19,25 @@ const LogInPage = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-    // const data: Record<string, string> = {};
-    // // Convert FormData to plain object
-    // formData.forEach((value, key) => {
-    //   data[key] = value.toString();
-    // });
-    // alert(`Form submitted with: ${JSON.stringify(data, null, 2)}`);
-
-    // const res=await fetch("http://localhost:5000/add-facility",{
-    //     method:"POST",
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify(data)
-    // })
-    // console.log(data);
+    const { email, password, name } = data;
+    const { data: user, error } = await authClient.signIn.email({
+      email: email, // required
+      password: password, // required
+      rememberMe: true,
+      callbackURL: "/",
+    });
+    if (user) {
+      alert(`log in successful!well come MR.`);
+    }
+    if (error) {
+      alert(`log in fail ${error.message}`);
+    }
+  };
+  const handelGoogleLogin = async () => {
+     await authClient.signIn.social({
+    provider: "google",
+    callbackURL: "/"
+  });
   };
 
   return (
@@ -44,11 +49,10 @@ const LogInPage = () => {
         height={100}
         className="mx-auto "
       />
-      <h1 className="text-2xl font-bold text-center text-[#810B38] mb-5 text-center">
+      <h1 className="text-2xl font-bold  text-[#810B38] mb-5 text-center">
         Well come our new user back!2q
       </h1>
       <Form className="flex mx-auto flex-col gap-4" onSubmit={onSubmit}>
-        
         <TextField
           isRequired
           name="email"
@@ -95,15 +99,20 @@ const LogInPage = () => {
             <Check />
             Log In
           </Button>
-          
         </div>
         <div className="flex justify-center items-center">
-            <div className="separet"></div>
-            <p>Or</p>
-            <div className="separet"></div>
+          <div className="separet"></div>
+          <p>Or</p>
+          <div className="separet"></div>
         </div>
         <div className="">
-            <Button variant="outline" className={"  w-full rounded-md flex place-items-center"}><DiGoogleDrive/> Log In with google</Button>
+          <Button
+          onClick={handelGoogleLogin}
+            variant="outline"
+            className={"  w-full rounded-md flex place-items-center"}
+          >
+            <DiGoogleDrive /> Log In with google
+          </Button>
         </div>
       </Form>
     </div>

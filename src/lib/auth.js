@@ -2,8 +2,8 @@ import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 
-const client = new MongoClient("mongodb://localhost:27017/database");
-const db = client.db();
+const client = new MongoClient(process.env.MONGO_URI);
+const db = client.db("khela-hobe");
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
@@ -14,10 +14,10 @@ export const auth = betterAuth({
   emailAndPassword: { 
     enabled: true, 
   }, 
-//   socialProviders: { 
-//     github: { 
-//       clientId: process.env.GITHUB_CLIENT_ID, 
-//       clientSecret: process.env.GITHUB_CLIENT_SECRET, 
-//     }, 
-//   },
+  socialProviders: { 
+     google: { 
+            clientId: process.env.GOOGLE_CLIENT_ID, 
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET, 
+        }, 
+  },
 });

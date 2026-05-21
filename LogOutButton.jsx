@@ -1,0 +1,21 @@
+'use client';
+import { authClient } from '@/lib/auth-client';
+import { Button } from '@heroui/react';
+import { redirect } from 'next/navigation';
+
+
+const LogOutButton = () => {
+    const handleLogOut=async()=>{
+        await authClient.signOut();
+        redirect("/")
+    }
+    return (
+        <div>
+            <Button variant="error" onClick={handleLogOut}>
+                Log Out
+            </Button>
+        </div>
+    );
+};
+
+export default LogOutButton;

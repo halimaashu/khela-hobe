@@ -1,9 +1,14 @@
+import { getUserData } from "@/lib/getUserData";
 import { Avatar, Button } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { BiDownArrow } from "react-icons/bi";
+import LogOutButton from "../../LogOutButton";
 
-const NavBar = () => {
+const NavBar = async () => {
+ const user =await getUserData();
+ console.log(user);
   return (
     <nav className="flex items-center justify-between p-3 shadow-lg">
       <div className="flex items-center gap-1">
@@ -26,17 +31,20 @@ const NavBar = () => {
           <Link href="/bookings">bookings</Link>
         </li>
       </ul>
-      <div className="flex items-center gap-3 hidden">
+
+<div className="">{
+  user?<div className="flex items-center gap-3 ">
         <Avatar>
           <Avatar.Image
             alt="John Doe"
-            src="https://img.heroui.chat/image/avatar?w=400&h=400&u=3"
+            referrerPolicy="no-referrer"
+            src={user?.image}
           />
-          <Avatar.Fallback>JD</Avatar.Fallback>
+          <Avatar.Fallback>{user?.name?.split(" ").map((n) => n[0]).join("")}</Avatar.Fallback>
         </Avatar>
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn m-1">
-           profile⬇️
+           profile <BiDownArrow/>
           </div>
           <ul
             tabIndex="-1"
@@ -48,18 +56,25 @@ const NavBar = () => {
             <li>
               <a>Item 2</a>
             </li>
+             <LogOutButton/>
           </ul>
+         
         </div>
         
-      </div>
-      <div className="flex items-center gap-2">
+      </div>:<div className="flex items-center gap-2">
         <Link href="/login">
           <Button variant="ghost">Login</Button>
         </Link>
         <Link href="/signup">
           <Button className={"bg-[#810B38]"}>Sign Up</Button>
         </Link>
-      </div>
+      </div>}</div>
+      
+
+
+      
+
+
     </nav>
   );
 };

@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { CiLocationOn } from "react-icons/ci";
+import { merienda } from "./Banner";
 
 const FacilityCrd = ({ re }) => {
   return (
@@ -21,7 +22,7 @@ const FacilityCrd = ({ re }) => {
           className="absolute rounded-md"
         />
       </div>
-      <h1 className="text-xl font-bold">{re.name}</h1>
+      <h1 className={`text-xl font-bold ${merienda.className}`}>{re.name}</h1>
       <h2 className="text-lg flex items-center">
         <CiLocationOn /> {re.location}
       </h2>

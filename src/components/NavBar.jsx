@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { BiDownArrow } from "react-icons/bi";
-import LogOutButton from "../../LogOutButton";
+import LogOutButton from "./LogOutButton";
+
 
 const NavBar = async () => {
   const user = await getUserData();

@@ -1,13 +1,15 @@
+import { auth } from "@/lib/auth";
 import { CancelConfirm } from "@/components/CnacelConfirm";
 import { getUserData } from "@/lib/getUserData";
-import { Button, Card, EmptyState } from "@heroui/react";
+import { Button, Card } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { ImFilesEmpty } from "react-icons/im";
+import { headers } from "next/headers";
 
 const BookingPage = async () => {
-  const {token}=await auth.api.getToken({headers:await headers()});
+  const { token } = await auth.api.getToken({ headers: await headers() });
   const user = await getUserData();
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/booking/${user?.id}`, {
     headers: {
@@ -15,12 +17,11 @@ const BookingPage = async () => {
     }
   });
   const bookings = await res.json();
-
   return (
     <div>
       {bookings?.length > 0 ? (
         <div className="">
-          <h1 className="text-2xl font-bold mt-5 mb-10">Booking Page</h1>
+          <h1 className="text-2xl font-bold mt-5 mb-10">MY Booking Page</h1>
 
           <div className="">
             {bookings.map((booking) => (

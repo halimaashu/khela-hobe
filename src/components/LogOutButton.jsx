@@ -8,6 +8,8 @@ const LogOutButton = () => {
     const handleLogOut=async()=>{
         await authClient.signOut();
         redirect("/")
+        location.reload();
+        
     }
     return (
         <div>

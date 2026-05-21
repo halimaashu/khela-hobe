@@ -7,8 +7,13 @@ import React from "react";
 import { ImFilesEmpty } from "react-icons/im";
 
 const BookingPage = async () => {
+  const {token}=await auth.api.getToken({headers:await headers()});
   const user = await getUserData();
-  const res = await fetch(`http://localhost:5000/booking/${user?.id}`);
+  const res = await fetch(`http://localhost:5000/booking/${user?.id}`, {
+    headers: {
+      authorization: `Bearer ${token}`
+    }
+  });
   const bookings = await res.json();
 
   return (

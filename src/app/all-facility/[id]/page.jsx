@@ -1,6 +1,8 @@
 import BookingCard from '@/components/BookingCard';
+import { auth } from '@/lib/auth';
 import { Delete, Star, StarFill } from '@gravity-ui/icons';
 import { Button} from '@heroui/react';
+import { headers } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BiLeftArrow } from 'react-icons/bi';
@@ -11,8 +13,11 @@ import { RiGhostFill } from 'react-icons/ri';
 
 const detailPage =async ({params}) => {
     const {id}=await params;
-    console.log(id)
-    const res =await fetch(`http://localhost:5000/featured/${id}`);
+    const {token}=await auth.api.getToken({headers:await headers()});
+    console.log(token)
+    const res =await fetch(`http://localhost:5000/featured/${id}`,{headers:{
+        authorization:`Bearer ${token}`
+    }});
     const data=await res.json();
 
     return (

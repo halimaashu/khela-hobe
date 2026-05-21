@@ -11,7 +11,7 @@ const LogOutButton = () => {
     }
     return (
         <div>
-            <Button variant="error" onClick={handleLogOut}>
+            <Button variant="outline" onClick={handleLogOut}>
                 Log Out
             </Button>
         </div>

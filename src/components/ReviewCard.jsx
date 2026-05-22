@@ -42,20 +42,28 @@ const reviews = [
   },
 ];
 const ReviewCard = () => {
-    return (
-        <div className="py-20 ">
-            <h1 className={`text-3xl font-bold text-center mb-8 ${merienda.className}`}>What Our Users Say</h1>
+  return (
+    <div className="py-20 ">
+      <h1
+        className={`text-3xl font-bold text-center mb-8 ${merienda.className}`}
+      >
+        What Our Client Say
+      </h1>
       <Marquee pauseOnHover>
         {reviews.map((review) => (
-          <Card className="bg-[#810B38] text-white mr-5 max-w-96 mb-10" key={review.id}>
-
-            <h3 className="text-lg font-bold"><PiUserFill /> {review.name}</h3>
+          <Card
+            className="bg-[#810B38] text-white mr-5 max-w-96 mb-10"
+            key={review.id}
+          >
+            <h3 className="text-lg font-bold">
+              <PiUserFill /> {review.name}
+            </h3>
             <p className={`text-sm ${merienda.className}`}>{review.review}</p>
           </Card>
         ))}
       </Marquee>
     </div>
-    );
+  );
 };
 
 export default ReviewCard;

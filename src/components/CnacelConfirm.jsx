@@ -4,19 +4,20 @@ import { authClient } from "@/lib/auth-client";
 import { AlertDialog, Button } from "@heroui/react";
 
 export function CancelConfirm({ booking }) {
-  // console.log(booking, "from alert dialog");
- 
   const handleCancel = async () => {
-    const {data:tokenData}=await authClient.token();
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/booking/${booking?._id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-type": "application/json",
-        authorization:`Bearer ${tokenData?.token}`
+    const { data: tokenData } = await authClient.token();
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/booking/${booking?._id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json",
+          authorization: `Bearer ${tokenData?.token}`,
+        },
       },
-    });
+    );
     const data = await res.json();
-    console.log(data);
+
     window.location.reload();
   };
   return (

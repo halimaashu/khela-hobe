@@ -28,14 +28,17 @@ const FacilityCrd = ({ re }) => {
       </h2>
       <h1 className="text-gray-500 flex items-center-safe gap-1">
         <StarFill className="text-green-500" />{" "}
-        <StarFill className="text-green-500" /> {re.facility_type ||"N/a"}
+        <StarFill className="text-green-500" /> {re.facility_type || "N/a"}
       </h1>
-     <Link href={`/all-facility/${re._id}`}> <button className="text-[#541A1A] underline flex items-center gap-3">
-        Book Now{" "}
-        <span className="-rotate-45">
-          <ArrowChevronRight fontSize={20} />
-        </span>
-      </button></Link>
+      <Link href={`/all-facility/${re._id}`}>
+        {" "}
+        <button className="text-[#541A1A] underline flex items-center gap-3">
+          Book Now{" "}
+          <span className="-rotate-45">
+            <ArrowChevronRight fontSize={20} />
+          </span>
+        </button>
+      </Link>
     </Card>
   );
 };

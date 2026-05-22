@@ -20,14 +20,17 @@ const AddFacilityPage = () => {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/add-facility`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/add-facility`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       },
-      body: JSON.stringify(data),
-    });
-    console.log(data);
+    );
+
     toast.success("Facility added successfully!");
     redirect("/all-facility");
   };

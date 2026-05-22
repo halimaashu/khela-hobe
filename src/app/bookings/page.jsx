@@ -12,13 +12,16 @@ import { merienda } from "@/components/Banner";
 const BookingPage = async () => {
   const { token } = await auth.api.getToken({ headers: await headers() });
   const user = await getUserData();
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/booking/${user?.id}`, {
-    headers: {
-      authorization: `Bearer ${token}`
-    }
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/booking/${user?.id}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    },
+  );
   const bookings = await res.json();
-  
+
   return (
     <div>
       {bookings?.length > 0 ? (
@@ -37,7 +40,9 @@ const BookingPage = async () => {
                     className="absolute rounded-md object-cover shadow-md "
                   />
                 </div>
-                <h2 className={`text-xl font-bold mt-4 ${merienda.className}`}>{booking.name}</h2>
+                <h2 className={`text-xl font-bold mt-4 ${merienda.className}`}>
+                  {booking.name}
+                </h2>
                 <h1 className="text-lg font-semibold text-[#541A1A]">
                   ${booking.price_per_hour.toFixed(2)} per hour
                 </h1>
@@ -53,14 +58,18 @@ const BookingPage = async () => {
           </div>
         </div>
       ) : (
-       <div className="py-20 flex justify-center items-center flex-col gap-6">
-        
-         <h1 className="text-2xl font-bold mt-5 mb-10 flex items-center"><ImFilesEmpty /> No bookings found</h1>
-         <p className="text-muted-foreground">
-           You have not made any bookings yet.
-         </p>
-        <Link href="/all-bookings"> <Button className={"bg-[#810B38]"}>Go to Bookings page</Button></Link>
-       </div>
+        <div className="py-20 flex justify-center items-center flex-col gap-6">
+          <h1 className="text-2xl font-bold mt-5 mb-10 flex items-center">
+            <ImFilesEmpty /> No bookings found
+          </h1>
+          <p className="text-muted-foreground">
+            You have not made any bookings yet.
+          </p>
+          <Link href="/all-bookings">
+            {" "}
+            <Button className={"bg-[#810B38]"}>Go to Bookings page</Button>
+          </Link>
+        </div>
       )}
     </div>
   );

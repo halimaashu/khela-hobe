@@ -8,7 +8,9 @@ const Featured = async () => {
   console.log(result);
   return (
     <div>
-      <h1 className="text-2xl font-bold mt-10 flex items-center gap-2"><MdFeaturedPlayList className="text-yellow-500"/> Featured Sports</h1>
+      <h1 className="text-2xl font-bold mt-10 flex items-center gap-2">
+        <MdFeaturedPlayList className="text-yellow-500" /> Featured Sports
+      </h1>
       <div className="grid md:grid-cols-3 gap-5 py-5">
         {result.map((re) => (
           <FacilityCrd key={re._id} re={re} />

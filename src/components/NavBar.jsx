@@ -7,11 +7,9 @@ import { BiDownArrow } from "react-icons/bi";
 import LogOutButton from "./LogOutButton";
 import { ThemeSwitch } from "./ThemeSwitch";
 
-
-
 const NavBar = async () => {
   const user = await getUserData();
-  console.log(user);
+
   return (
     <nav className="flex items-center justify-between p-3 shadow-lg">
       <div className="flex items-center gap-1">
@@ -32,7 +30,9 @@ const NavBar = async () => {
         <li>
           <Link href="/all-facility">All Facility</Link>
         </li>
-       <h1><ThemeSwitch/></h1>
+        <h1>
+          <ThemeSwitch />
+        </h1>
       </ul>
 
       <div className="hidden md:flex flex-col">
@@ -124,7 +124,9 @@ const NavBar = async () => {
                 <li>
                   <Link href="/manage-facilities">Manage My Facilities</Link>
                 </li>
-                <h1><LogOutButton /></h1>
+                <h1>
+                  <LogOutButton />
+                </h1>
               </ul>
             </div>
           </div>

@@ -35,10 +35,10 @@ const LogInPage = () => {
     }
   };
   const handelGoogleLogin = async () => {
-     await authClient.signIn.social({
-    provider: "google",
-    callbackURL: "/"
-  });
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    });
   };
 
   return (
@@ -108,7 +108,7 @@ const LogInPage = () => {
         </div>
         <div className="">
           <Button
-          onClick={handelGoogleLogin}
+            onClick={handelGoogleLogin}
             variant="outline"
             className={"  w-full rounded-md flex place-items-center"}
           >

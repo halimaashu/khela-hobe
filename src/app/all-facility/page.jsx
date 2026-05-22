@@ -4,11 +4,9 @@ import React from "react";
 
 const AllFacilityPage = async ({ searchParams }) => {
   const { search = "", sport = "" } = await searchParams;
-
   const params = new URLSearchParams();
   if (search) params.append("search", search);
   if (sport) params.append("sport", sport);
-
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SERVER_URL}/featured?${params}`,
   );

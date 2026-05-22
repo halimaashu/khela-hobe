@@ -5,6 +5,8 @@ import Link from "next/link";
 import React from "react";
 import { BiDownArrow } from "react-icons/bi";
 import LogOutButton from "./LogOutButton";
+import { ThemeSwitch } from "./ThemeSwitch";
+
 
 
 const NavBar = async () => {
@@ -30,6 +32,7 @@ const NavBar = async () => {
         <li>
           <Link href="/all-facility">All Facility</Link>
         </li>
+       <ThemeSwitch/>
       </ul>
 
       <div className="hidden md:flex flex-col">
@@ -54,7 +57,7 @@ const NavBar = async () => {
               </div>
               <ul
                 tabIndex="-1"
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                className="dropdown-content menu  rounded-box z-1 w-52 p-2 shadow-sm"
               >
                 <li>
                   <Link href="/add-facility">Add Facility</Link>
@@ -102,7 +105,7 @@ const NavBar = async () => {
               </div>
               <ul
                 tabIndex="-1"
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                className="dropdown-content menu  rounded-box z-1 w-52 p-2 shadow-sm"
               >
                 <li>
                   <Link href="/">Home</Link>

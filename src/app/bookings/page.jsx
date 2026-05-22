@@ -18,6 +18,7 @@ const BookingPage = async () => {
     }
   });
   const bookings = await res.json();
+  
   return (
     <div>
       {bookings?.length > 0 ? (
@@ -26,7 +27,7 @@ const BookingPage = async () => {
 
           <div className="">
             {bookings.map((booking) => (
-              <Card className="mb-4 rounded-md shadow-md" key={booking.userId}>
+              <Card className="mb-4 rounded-md shadow-md" key={booking?._id}>
                 <div className="relative w-full h-48">
                   {" "}
                   <Image

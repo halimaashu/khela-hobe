@@ -107,7 +107,7 @@ const AddFacilityPage = () => {
           <FieldError className="text-red-500 text-sm" />
         </TextField>
         <TextField isRequired name="description" type="text">
-          <Label>Description</Label>
+          <Label>Deion</Label>
           <Input placeholder="Enter facility description" />
 
           <FieldError />

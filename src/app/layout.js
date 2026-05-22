@@ -3,6 +3,7 @@ import "./globals.css";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { ToastContainer } from "react-toastify";
+import HeroUiThemeProvider from "./provider/HeroUiThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,9 +25,11 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${geistSans.variable} ${inter.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className={`min-h-full flex flex-col ${inter.className}`}>
-        <NavBar/>
+      <body className={`min-h-full flex flex-col bg-background text-foreground ${inter.className}`}>
+       <HeroUiThemeProvider>
+         <NavBar/>
         <main className="">
          <div className="max-w-6xl mx-auto">
            {children}
@@ -34,6 +37,7 @@ export default function RootLayout({ children }) {
         </main>
         <Footer/>
         <ToastContainer />
+       </HeroUiThemeProvider>
       </body>
     </html>
   );

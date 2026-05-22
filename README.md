@@ -1,36 +1,166 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# ⚽ Khela Hobe
 
-First, run the development server:
+> **Online Play Booking App** built with **Next.js**
+
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge\&logo=next.js)
+![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge\&logo=react)
+![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-38BDF8?style=for-the-badge\&logo=tailwind-css\&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
+---
+
+## 🚀 About The Project
+
+**Khela Hobe** is a modern online sports play booking platform where users can:
+
+* 🏟️ Book sports grounds & turfs
+* 👥 Create and join matches
+* 📅 Schedule play sessions easily
+* 💳 Manage online bookings
+* 📍 Discover nearby sports venues
+* 🔔 Get instant booking updates
+
+This project is designed with a clean UI, fast performance, and responsive experience using **Next.js**.
+
+---
+
+## 👨‍💻 Developer
+
+### Ashik
+
+Passionate CSE student & web developer learning modern full-stack development.
+
+---
+
+# ✨ Features
+
+* ⚡ Fast and optimized Next.js app
+* 🎨 Beautiful responsive UI
+* 🔐 Authentication system
+* 📆 Booking management
+* 🏟️ Turf & venue listing
+* 💬 Real-time notifications
+
+* 📱 Mobile-friendly design
+
+---
+🌐 Live Demo
+https://khela-hobe-self.vercel.app/
+
+# 🛠️ Tech Stack
+
+| Technology   | Usage              |
+| ------------ | ------------------ |
+| Next.js      | Frontend & Backend |
+| React        | UI Development     |
+| Tailwind CSS | Styling            |
+| MongoDB      | Database           |
+| BetterAuth     | Authentication     |
+| vercel     | Deployment         |
+
+---
+
+# 📂 Project Structure
+
+
+
+---
+
+# ⚙️ Installation
+
+## 1️⃣ Clone the repository
+
+```bash
+git clone https://github.com/halimaashu/khela-hobe.git
+```
+
+## 2️⃣ Navigate to the project
+
+```bash
+cd khela-hobe
+```
+
+## 3️⃣ Install dependencies
+
+```bash
+npm install
+```
+
+## 4️⃣ Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Now open:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+# 🔑 Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+Create a `.env.local` file and add:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+NEXTAUTH_SECRET=your_secret
+MONGODB_URI=your_mongodb_uri
+NEXTAUTH_URL=http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+# 📸 Preview
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```txt
+🏆 Find Grounds
+⚽ Book Matches
+📅 Manage Schedule
+🔥 Play With Friends
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+# 🚀 Deployment
+
+Deploy easily using:
+
+* ▲ Vercel
+* Netlify
+* Render
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+1. Fork the project
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+---
+
+# ⭐ Support
+
+If you like this project, give it a ⭐ on GitHub.
+
+---
+
+# 📄 License
+
+This project is licensed under the **MIT License**.
+
+---
+
+# ❤️ Made with Passion by Ashik
+
+```txt
+"Khela Hobe — Where Players Meet The Game"
+```
+

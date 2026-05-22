@@ -7,6 +7,7 @@ import Link from "next/link";
 import React from "react";
 import { ImFilesEmpty } from "react-icons/im";
 import { headers } from "next/headers";
+import { merienda } from "@/components/Banner";
 
 const BookingPage = async () => {
   const { token } = await auth.api.getToken({ headers: await headers() });
@@ -35,7 +36,7 @@ const BookingPage = async () => {
                     className="absolute rounded-md object-cover shadow-md "
                   />
                 </div>
-                <h2 className="text-xl font-bold mt-4">{booking.name}</h2>
+                <h2 className={`text-xl font-bold mt-4 ${merienda.className}`}>{booking.name}</h2>
                 <h1 className="text-lg font-semibold text-[#541A1A]">
                   ${booking.price_per_hour.toFixed(2)} per hour
                 </h1>

@@ -50,7 +50,7 @@ const ReviewCard = () => {
           <Card className="bg-[#810B38] text-white mr-5 max-w-96 mb-10" key={review.id}>
 
             <h3 className="text-lg font-bold"><PiUserFill /> {review.name}</h3>
-            <p className="text-sm">{review.review}</p>
+            <p className={`text-sm ${merienda.className}`}>{review.review}</p>
           </Card>
         ))}
       </Marquee>

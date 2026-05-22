@@ -3,7 +3,8 @@ import "./globals.css";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { ToastContainer } from "react-toastify";
-import HeroUiThemeProvider from "./provider/HeroUiThemeProvider";
+import HeroUiThemeProvider from "@/provider/HeroUiThemeProvider";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

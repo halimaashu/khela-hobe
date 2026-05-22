@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
        <HeroUiThemeProvider>
          <NavBar/>
         <main className="">
-         <div className="max-w-6xl mx-auto">
+         <div className="max-w-6xl mx-auto p-1">
            {children}
          </div>
         </main>

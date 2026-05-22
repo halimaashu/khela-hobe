@@ -62,7 +62,7 @@ const detailPage = async ({ params }) => {
           </div>
         </div>
       </div>
-      <div className="flex justify-between items-center">
+      <div className="md:flex justify-between items-center ">
         <div className="">
           <Link href="/all-facility">
             <button className="text-[#810B38] flex items-center gap-2">
@@ -70,7 +70,7 @@ const detailPage = async ({ params }) => {
               go back
             </button>
           </Link>
-          <div className="mt-4 flex items-center gap-4">
+          <div className="mt-4 flex mr-2 mb-5 items-center gap-4">
             <Button variant="outline" className={" px-10"}>
               update
             </Button>

@@ -124,7 +124,7 @@ const NavBar = async () => {
                 <li>
                   <Link href="/manage-facilities">Manage My Facilities</Link>
                 </li>
-                <LogOutButton />
+                <h1><LogOutButton /></h1>
               </ul>
             </div>
           </div>

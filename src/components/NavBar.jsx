@@ -32,7 +32,7 @@ const NavBar = async () => {
         <li>
           <Link href="/all-facility">All Facility</Link>
         </li>
-       <ThemeSwitch/>
+       <h1><ThemeSwitch/></h1>
       </ul>
 
       <div className="hidden md:flex flex-col">
@@ -68,7 +68,9 @@ const NavBar = async () => {
                 <li>
                   <Link href="/">Manage My Facilities</Link>
                 </li>
-                <LogOutButton />
+                <li>
+                  <LogOutButton />
+                </li>
               </ul>
             </div>
           </div>

@@ -12,6 +12,8 @@ import {
   ListBox,
 } from "@heroui/react";
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { toast } from "react-toastify";
 const AddFacilityPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -26,6 +28,8 @@ const AddFacilityPage = () => {
       body: JSON.stringify(data),
     });
     console.log(data);
+    toast.success("Facility added successfully!");
+    redirect("/all-facility");
   };
 
   return (
@@ -48,7 +52,7 @@ const AddFacilityPage = () => {
           <FieldError />
         </TextField>
 
-        <Select className="" placeholder="Select one">
+        <Select name="facility_type" className="" placeholder="Select one">
           <Label>facility_type</Label>
           <Select.Trigger>
             <Select.Value />
@@ -139,7 +143,7 @@ const AddFacilityPage = () => {
         <div className="flex gap-2">
           <Button className={"bg-[#810B38]"} type="submit">
             <Check />
-            Submit
+            Add Facility
           </Button>
           <Button className={"text-[#810B38]"} type="reset" variant="secondary">
             Reset

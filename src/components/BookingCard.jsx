@@ -29,7 +29,7 @@ const BookingCard = ({data}) => {
         console.log(bookingData)
 
         const {data:tokenData}=await authClient.token();
-        console.log(tokenData,"from booking data")
+        // console.log(tokenData,"from booking data")
         const res=await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/booking`, {
             method: "POST",
             headers: {

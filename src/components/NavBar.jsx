@@ -63,7 +63,7 @@ const NavBar = async () => {
                   <Link href="/bookings">bookings</Link>
                 </li>
                 <li>
-                  <Link href="/manage-facilities">Manage My Facilities</Link>
+                  <Link href="/">Manage My Facilities</Link>
                 </li>
                 <LogOutButton />
               </ul>

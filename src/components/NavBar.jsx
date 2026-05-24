@@ -35,7 +35,7 @@ const NavBar = async () => {
         </h1>
       </ul>
 
-      <div className="hidden md:flex flex-col">
+      <div className="hidden md:flex flex-col shadow-2xl ">
         {user ? (
           <div className="flex items-center gap-3 ">
             <Avatar>
@@ -57,7 +57,7 @@ const NavBar = async () => {
               </div>
               <ul
                 tabIndex="-1"
-                className="dropdown-content menu  rounded-box z-1 w-52 p-2 shadow-sm"
+                className="dropdown-content menu  rounded-box z-1 w-52 p-2 shadow-sm bg-[#DCC3AA]"
               >
                 <li>
                   <Link href="/add-facility">Add Facility</Link>
@@ -68,6 +68,7 @@ const NavBar = async () => {
                 <li>
                   <Link href="/">Manage My Facilities</Link>
                 </li>
+               
                 <li>
                   <LogOutButton />
                 </li>
@@ -75,17 +76,18 @@ const NavBar = async () => {
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-[#DCC3AA]">
             <Link href="/login">
               <Button variant="ghost">Login</Button>
             </Link>
             <Link href="/signup">
               <Button className={"bg-[#810B38]"}>Sign Up</Button>
             </Link>
+       
           </div>
         )}
       </div>
-      <div className="flex flex-col md:hidden">
+      <div className="flex flex-col md:hidden shadow-2xl ">
         {user ? (
           <div className="flex items-center gap-3 ">
             <Avatar>
@@ -107,7 +109,7 @@ const NavBar = async () => {
               </div>
               <ul
                 tabIndex="-1"
-                className="dropdown-content menu  rounded-box z-1 w-52 p-2 shadow-sm"
+                className="dropdown-content menu  rounded-box z-1 w-52 p-2 shadow-sm bg-[#DCC3AA]"
               >
                 <li>
                   <Link href="/">Home</Link>
@@ -125,6 +127,9 @@ const NavBar = async () => {
                   <Link href="/manage-facilities">Manage My Facilities</Link>
                 </li>
                 <h1>
+                  <ThemeSwitch />
+                </h1>
+                <h1>
                   <LogOutButton />
                 </h1>
               </ul>
@@ -138,6 +143,9 @@ const NavBar = async () => {
             <Link href="/signup">
               <Button className={"bg-[#810B38]"}>Sign Up</Button>
             </Link>
+            <h1>
+              <ThemeSwitch />
+            </h1>
           </div>
         )}
       </div>

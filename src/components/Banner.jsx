@@ -3,39 +3,35 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
+// Import Gravity UI Icons
 import {
-  BiHome,
-  BiBuilding,
-  BiPlus,
-  BiBook,
-  BiBriefcase,
-  BiUser,
-  BiMenu,
-  BiX,
-  BiLogOut,
-  BiChevronDown,
-  BiSun,
-  BiMoon,
-} from "react-icons/bi";
+  House,
+  Buildings,
+  Plus,
+  BookOpen,
+  Briefcase,
+  User,
+  Bars,
+  Xmark,
+  ChevronDown
+} from "@gravity-ui/icons";
+
 import LogOutButton from "./LogOutButton";
 import { ThemeSwitch } from "./ThemeSwitch";
 
 const navItems = [
-  { href: "/", label: "Home", icon: BiHome },
-  { href: "/all-facility", label: "All facilities", icon: BiBuilding },
+  { href: "/", label: "Home", icon: House },
+  { href: "/all-facility", label: "All facilities", icon: Buildings },
 ];
 
 const userNavItems = [
-  { href: "/add-facility", label: "Add facility", icon: BiPlus },
-  { href: "/bookings", label: "My bookings", icon: BiBook },
-  { href: "/manage-facilities", label: "Manage facilities", icon: BiBriefcase },
+  { href: "/add-facility", label: "Add facility", icon: Plus },
+  { href: "/bookings", label: "My bookings", icon: BookOpen },
+  { href: "/manage-facilities", label: "Manage facilities", icon: Briefcase },
 ];
 
-function AvatarCircle({
-  name,
-  src,
-  size = 28,
-}) {
+function AvatarCircle({ name, src, size = 28 }) {
   const initials = name
     ? name
         .split(" ")
@@ -76,10 +72,7 @@ export const NavBarView = ({ user = null }) => {
   // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
       }
     }
@@ -102,10 +95,7 @@ export const NavBarView = ({ user = null }) => {
         <div className="flex items-center justify-between h-14">
 
           {/* ── Logo ── */}
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 group flex-shrink-0"
-          >
+          <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
             <div className="relative w-8 h-8 rounded-lg overflow-hidden ring-1 ring-border/30 transition-transform group-hover:scale-105">
               <Image
                 src="/khela-hobe.png"
@@ -128,7 +118,7 @@ export const NavBarView = ({ user = null }) => {
                   href={href}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 >
-                  <Icon className="text-base shrink-0" />
+                  <Icon className="text-sm shrink-0" />
                   {label}
                 </Link>
               </li>
@@ -157,8 +147,8 @@ export const NavBarView = ({ user = null }) => {
                       {user.role || "Member"}
                     </span>
                   </div>
-                  <BiChevronDown
-                    className={`text-muted-foreground text-sm ml-0.5 transition-transform duration-200 ${
+                  <ChevronDown
+                    className={`text-muted-foreground text-xs ml-0.5 transition-transform duration-200 ${
                       dropdownOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -169,7 +159,7 @@ export const NavBarView = ({ user = null }) => {
                   <div className="absolute right-0 top-[calc(100%+6px)] w-52 bg-background border border-border/50 rounded-xl shadow-lg py-1.5 z-50">
                     <DropdownLink
                       href="/profile"
-                      icon={BiUser}
+                      icon={User}
                       label="Profile"
                       onClick={() => setDropdownOpen(false)}
                     />
@@ -218,9 +208,9 @@ export const NavBarView = ({ user = null }) => {
               className="w-8 h-8 flex items-center justify-center rounded-lg border border-border/40 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
               {mobileOpen ? (
-                <BiX className="text-xl" />
+                <Xmark className="text-base" />
               ) : (
-                <BiMenu className="text-xl" />
+                <Bars className="text-base" />
               )}
             </button>
           </div>
@@ -273,7 +263,7 @@ export const NavBarView = ({ user = null }) => {
               </p>
               <DrawerLink
                 href="/profile"
-                icon={BiUser}
+                icon={User}
                 label="Profile"
                 onClick={() => setMobileOpen(false)}
               />
@@ -320,37 +310,27 @@ export const NavBarView = ({ user = null }) => {
 
 /* ── Small reusable sub-components ── */
 
-function DropdownLink({
-  href,
-  icon: Icon,
-  label,
-  onClick,
-}) {
+function DropdownLink({ href, icon: Icon, label, onClick }) {
   return (
     <Link
       href={href}
       onClick={onClick}
       className="flex items-center gap-2.5 px-3 py-1.5 mx-1 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
     >
-      <Icon className="text-base text-muted-foreground shrink-0" />
+      <Icon className="text-sm text-muted-foreground shrink-0" />
       {label}
     </Link>
   );
 }
 
-function DrawerLink({
-  href,
-  icon: Icon,
-  label,
-  onClick,
-}) {
+function DrawerLink({ href, icon: Icon, label, onClick }) {
   return (
     <Link
       href={href}
       onClick={onClick}
       className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium text-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
     >
-      <Icon className="text-xl text-primary shrink-0" />
+      <Icon className="text-base text-primary shrink-0" />
       {label}
     </Link>
   );

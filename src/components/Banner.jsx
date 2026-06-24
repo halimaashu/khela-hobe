@@ -1,47 +1,383 @@
-import React from "react";
+"use client";
 
-import { FaStarHalfAlt } from "react-icons/fa";
-import { IoIosTrophy } from "react-icons/io";
-import { Button } from "@heroui/react";
-import { BsBrowserChrome } from "react-icons/bs";
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { Merienda } from "next/font/google";
+import {
+  BiHome,
+  BiBuilding,
+  BiPlus,
+  BiBook,
+  BiBriefcase,
+  BiUser,
+  BiMenu,
+  BiX,
+  BiLogOut,
+  BiChevronDown,
+  BiSun,
+  BiMoon,
+} from "react-icons/bi";
+import LogOutButton from "./LogOutButton";
+import { ThemeSwitch } from "./ThemeSwitch";
 
-export const merienda = Merienda({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-});
+interface NavUser {
+  name?: string | null;
+  image?: string | null;
+  role?: string | null;
+}
 
-const Banner = () => {
+interface NavBarViewProps {
+  user?: NavUser | null;
+}
+
+const navItems = [
+  { href: "/", label: "Home", icon: BiHome },
+  { href: "/all-facility", label: "All facilities", icon: BiBuilding },
+];
+
+const userNavItems = [
+  { href: "/add-facility", label: "Add facility", icon: BiPlus },
+  { href: "/bookings", label: "My bookings", icon: BiBook },
+  { href: "/manage-facilities", label: "Manage facilities", icon: BiBriefcase },
+];
+
+function AvatarCircle({
+  name,
+  src,
+  size = 28,
+}: {
+  name?: string | null;
+  src?: string | null;
+  size?: number;
+}) {
+  const initials = name
+    ? name
+        .split(" ")
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "U";
+
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt={name || "User"}
+        width={size}
+        height={size}
+        className="rounded-full object-cover ring-2 ring-transparent"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+
   return (
     <div
-      className="relative h-screen bg-cover bg-center bg-no-repeat flex justify-center items-center"
-      style={{ backgroundImage: "url('/khele-hero-bg.jpg')" }}
+      className="rounded-full flex items-center justify-center font-medium flex-shrink-0 bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300"
+      style={{ width: size, height: size, fontSize: size * 0.4 }}
     >
-      <div className="absolute inset-0 bg-black/50 flex justify-center items-center" />
-
-      <div className="relative z-10 p-1 md:p-5 flex justify-center items-center flex-col space-y-6">
-        <h1 className="text-white text-5xl font-bold flex items-center gap-3 flex-wrap">
-          Online <span className="text-yellow-400">Sport</span> booking{" "}
-          <span className="text-[#810B38]">app</span>{" "}
-          <IoIosTrophy className="text-yellow-500" />
-        </h1>
-        <h2
-          className={`text-white font-semibold text-xl mt-4 flex items-center gap-2 ${merienda.className}`}
-        >
-          <FaStarHalfAlt className="text-green-500" /> Cholo Kheli! Say yes to
-          fitness and no to drugs. <br /> Book your favorite local sports
-          instantly.
-        </h2>
-
-        <Link href="/all-facility">
-          <Button className={"bg-[#810B38] "}>
-            <BsBrowserChrome /> Browse all Facilities
-          </Button>
-        </Link>
-      </div>
+      {initials}
     </div>
+  );
+}
+
+export const NavBarView = ({ user = null }: NavBarViewProps) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  // Close mobile drawer on resize to desktop
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth >= 1024) setMobileOpen(false);
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <nav className="sticky top-0 z-50 w-full bg-background border-b border-border/40 shadow-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14">
+
+          {/* ── Logo ── */}
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 group flex-shrink-0"
+          >
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden ring-1 ring-border/30 transition-transform group-hover:scale-105">
+              <Image
+                src="/khela-hobe.png"
+                alt="Khela Hobe logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="text-[15px] font-semibold tracking-tight text-foreground">
+              Khela <span className="text-primary">Hobe</span>
+            </span>
+          </Link>
+
+          {/* ── Desktop centre links ── */}
+          <ul className="hidden lg:flex items-center gap-0.5 list-none">
+            {navItems.map(({ href, label, icon: Icon }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                >
+                  <Icon className="text-base shrink-0" />
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* ── Desktop right ── */}
+          <div className="hidden lg:flex items-center gap-2">
+            <ThemeSwitch />
+
+            {user ? (
+              /* User dropdown */
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen((v) => !v)}
+                  aria-expanded={dropdownOpen}
+                  aria-haspopup="true"
+                  className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border/40 hover:border-border/80 hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                >
+                  <AvatarCircle name={user.name} src={user.image} size={28} />
+                  <div className="flex flex-col items-start leading-tight max-w-[110px]">
+                    <span className="text-[13px] font-medium text-foreground truncate w-full">
+                      {user.name || "User"}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground capitalize">
+                      {user.role || "Member"}
+                    </span>
+                  </div>
+                  <BiChevronDown
+                    className={`text-muted-foreground text-sm ml-0.5 transition-transform duration-200 ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown menu */}
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-[calc(100%+6px)] w-52 bg-background border border-border/50 rounded-xl shadow-lg py-1.5 z-50">
+                    <DropdownLink
+                      href="/profile"
+                      icon={BiUser}
+                      label="Profile"
+                      onClick={() => setDropdownOpen(false)}
+                    />
+                    {userNavItems.map(({ href, label, icon }) => (
+                      <DropdownLink
+                        key={href}
+                        href={href}
+                        icon={icon}
+                        label={label}
+                        onClick={() => setDropdownOpen(false)}
+                      />
+                    ))}
+                    <div className="my-1 h-px bg-border/40 mx-2" />
+                    <div className="px-1">
+                      <LogOutButton />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Auth buttons */
+              <div className="flex items-center gap-1.5">
+                <Link
+                  href="/login"
+                  className="px-3.5 py-1.5 rounded-lg text-sm font-medium text-muted-foreground border border-border/40 hover:border-border/80 hover:bg-accent transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-3.5 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* ── Mobile: theme + hamburger ── */}
+          <div className="flex lg:hidden items-center gap-1.5">
+            <ThemeSwitch />
+            <button
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-expanded={mobileOpen}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-border/40 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            >
+              {mobileOpen ? (
+                <BiX className="text-xl" />
+              ) : (
+                <BiMenu className="text-xl" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile drawer ── */}
+      <div
+        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out border-t border-border/40 ${
+          mobileOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="px-4 pb-6 pt-3 space-y-1 bg-background max-h-[calc(100vh-56px)] overflow-y-auto">
+
+          {/* User identity card */}
+          {user && (
+            <div className="flex items-center gap-3 p-3 mb-2 bg-accent/50 rounded-xl">
+              <AvatarCircle name={user.name} src={user.image} size={38} />
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  {user.name || "User"}
+                </p>
+                <p className="text-xs text-muted-foreground capitalize">
+                  {user.role || "Member"}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation section */}
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2 pb-1 pt-1">
+            Navigation
+          </p>
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <DrawerLink
+              key={href}
+              href={href}
+              icon={Icon}
+              label={label}
+              onClick={() => setMobileOpen(false)}
+            />
+          ))}
+
+          {/* Workspace section (logged in only) */}
+          {user && (
+            <>
+              <div className="h-px bg-border/40 my-2 mx-1" />
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-2 pb-1">
+                Workspace
+              </p>
+              <DrawerLink
+                href="/profile"
+                icon={BiUser}
+                label="Profile"
+                onClick={() => setMobileOpen(false)}
+              />
+              {userNavItems.map(({ href, label, icon }) => (
+                <DrawerLink
+                  key={href}
+                  href={href}
+                  icon={icon}
+                  label={label}
+                  onClick={() => setMobileOpen(false)}
+                />
+              ))}
+              <div className="h-px bg-border/40 my-2 mx-1" />
+              <div className="px-1">
+                <LogOutButton />
+              </div>
+            </>
+          )}
+
+          {/* Guest CTAs */}
+          {!user && (
+            <div className="grid grid-cols-2 gap-2 pt-3 mt-2 border-t border-border/40">
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center py-2 rounded-lg text-sm font-medium border border-border/50 text-muted-foreground hover:bg-accent transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 };
 
-export default Banner;
+/* ── Small reusable sub-components ── */
+
+function DropdownLink({
+  href,
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  href: string;
+  icon: React.ElementType;
+  label: string;
+  onClick?: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="flex items-center gap-2.5 px-3 py-1.5 mx-1 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
+    >
+      <Icon className="text-base text-muted-foreground shrink-0" />
+      {label}
+    </Link>
+  );
+}
+
+function DrawerLink({
+  href,
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  href: string;
+  icon: React.ElementType;
+  label: string;
+  onClick?: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium text-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
+    >
+      <Icon className="text-xl text-primary shrink-0" />
+      {label}
+    </Link>
+  );
+}
+
+export default NavBarView;

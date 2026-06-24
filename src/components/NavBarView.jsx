@@ -98,22 +98,26 @@ export const NavBarView = ({ user = null }) => {
                       <BiDownArrow className="text-foreground/40 group-hover:text-foreground transition-colors text-[10px]" />
                     </div>
                   </DropdownTrigger>
+                  
+                  {/* FIX applied: Ensuring strict usage of DropdownItem structures for all navigation elements */}
                   <DropdownMenu variant="flat" aria-label="User menu container" className="w-56">
                     <DropdownItem key="profile" startContent={<BiUser className="text-lg" />}>
-                      <Link href="/profile" className="w-full block">Profile</Link>
+                      <Link href="/profile" className="w-full h-full block">Profile</Link>
                     </DropdownItem>
                     
                     {userNavItems.map((item) => {
                       const Icon = item.icon;
                       return (
                         <DropdownItem key={item.href} startContent={<Icon className="text-lg" />}>
-                          <Link href={item.href} className="w-full block">{item.label}</Link>
+                          <Link href={item.href} className="w-full h-full block">{item.label}</Link>
                         </DropdownItem>
                       );
                     })}
                     
-                    <DropdownItem key="logout" className="text-danger" color="danger" closeOnSelect={false}>
-                      <LogOutButton />
+                    <DropdownItem key="logout" className="text-danger" color="danger">
+                      <div className="w-full h-full">
+                        <LogOutButton />
+                      </div>
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>

@@ -20,16 +20,6 @@ import {
 import LogOutButton from "./LogOutButton";
 import { ThemeSwitch } from "./ThemeSwitch";
 
-interface NavUser {
-  name?: string | null;
-  image?: string | null;
-  role?: string | null;
-}
-
-interface NavBarViewProps {
-  user?: NavUser | null;
-}
-
 const navItems = [
   { href: "/", label: "Home", icon: BiHome },
   { href: "/all-facility", label: "All facilities", icon: BiBuilding },
@@ -45,10 +35,6 @@ function AvatarCircle({
   name,
   src,
   size = 28,
-}: {
-  name?: string | null;
-  src?: string | null;
-  size?: number;
 }) {
   const initials = name
     ? name
@@ -82,17 +68,17 @@ function AvatarCircle({
   );
 }
 
-export const NavBarView = ({ user = null }: NavBarViewProps) => {
+export const NavBarView = ({ user = null }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef(null);
 
   // Close dropdown on outside click
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handleClick(e) {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
+        !dropdownRef.current.contains(e.target)
       ) {
         setDropdownOpen(false);
       }
@@ -339,11 +325,6 @@ function DropdownLink({
   icon: Icon,
   label,
   onClick,
-}: {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-  onClick?: () => void;
 }) {
   return (
     <Link
@@ -362,11 +343,6 @@ function DrawerLink({
   icon: Icon,
   label,
   onClick,
-}: {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-  onClick?: () => void;
 }) {
   return (
     <Link

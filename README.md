@@ -126,7 +126,7 @@ lib/                     Auth setup and helpers
 
 | Home page | Facility details |
 |---|---|
-| ![Home page](./public/screenshots/home.png) | ![Facility details](./public/screenshots/detail-page.png) |
+| ![Home page](./public/screenshots/home.png) | ![Facility details](./public/screenshots/Detail_page.png) |
 
 ![Booking panel](./public/screenshots/booking.png)
 

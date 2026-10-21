@@ -52,7 +52,7 @@
 
 ```bash
 git clone https://github.com/halimaashu/khela-hobe
-cd khalahobe
+cd khela-hobe
 ```
 
 ### 2. Install dependencies
@@ -124,10 +124,11 @@ lib/                     Auth setup and helpers
 
 ## Screenshots
 
-> Add screenshots of the home page, a facility page and the booking panel here.
-> Put the images in a `screenshots/` folder and link them, for example:
-> `![Home page](./public/screenshots/home.png)`
- `![Detail Pages](./public/screenshots/Detail_page.png)`
+| Home page | Facility details |
+|---|---|
+| ![Home page](./public/screenshots/home.png) | ![Facility details](./public/screenshots/detail-page.png) |
+
+![Booking panel](./public/screenshots/booking.png)
 
 ---
 

@@ -22,7 +22,7 @@ const Footer = () => {
   const socialLinks = [
     {
       name: "Facebook",
-      href: "https://facebook.com",
+      href: "https://www.facebook.com/ashik.rahman.322962",
       icon: FaFacebookF,
       hoverBg: "hover:bg-blue-600 hover:text-white",
     },
@@ -34,13 +34,14 @@ const Footer = () => {
     },
     {
       name: "WhatsApp",
-      href: "https://wa.me",
+      href: "https://wa.me/+8801975665249",
       icon: FaWhatsapp,
       hoverBg: "hover:bg-emerald-500 hover:text-white",
     },
     {
       name: "LinkedIn",
-      href: "https://linkedin.com",
+      // https://www.linkedin.com/in/ashkrahman/
+      href: "https://www.linkedin.com/in/ashkrahman/",
       icon: FaLinkedinIn,
       hoverBg: "hover:bg-sky-600 hover:text-white",
     },
@@ -52,7 +53,7 @@ const Footer = () => {
     },
     {
       name: "X (Twitter)",
-      href: "https://x.com",
+      href: "https://x.com/AshikurRahmJR",
       icon: FaXTwitter,
       hoverBg: "hover:bg-slate-900 dark:hover:bg-white dark:hover:text-black hover:text-white",
     },

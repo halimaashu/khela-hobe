@@ -1,303 +1,436 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 import { toast } from "react-toastify";
-import { 
-  HiOutlineUser, 
-  HiOutlineMail, 
-  HiOutlineLockClosed, 
-  HiOutlinePhotograph, 
-  HiOutlineEye, 
-  HiOutlineEyeOff 
-} from "react-icons/hi"; // Standardized icons
-import { HiOutlineMail as MailIcon, HiOutlineLockClosed as LockIcon, HiOutlineUser as UserIcon, HiOutlinePhotograph as PhotoIcon } from "react-icons/hi";
+import { authClient } from "@/lib/auth-client";
+import {
+  HiOutlineUser,
+  HiOutlineMail,
+  HiOutlineLockClosed,
+  HiOutlineEye,
+  HiOutlineEyeOff,
+} from "react-icons/hi";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
-import { StarFill } from "@gravity-ui/icons";
+
+const MAX_IMAGE_MB = 5;
+
+const highlights = [
+  { title: "Live availability", text: "See open hours for every facility before you book." },
+  { title: "Book in under a minute", text: "Pick a slot, confirm, and you are set." },
+  { title: "Everything in one place", text: "Track and manage all your bookings from your account." },
+];
+
+const inputClass =
+  "w-full h-11 pl-10 pr-4 rounded-xl border text-sm outline-none transition-colors " +
+  "focus:border-[var(--k-brand)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--k-brand)_25%,transparent)]";
+
+const fieldStyle = {
+  background: "var(--k-surface)",
+  borderColor: "var(--k-border)",
+  color: "var(--k-text)",
+};
+
+async function uploadToImgbb(file) {
+  const key = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+  if (!key) throw new Error("Missing NEXT_PUBLIC_IMGBB_API_KEY in .env.local");
+
+  const body = new FormData();
+  body.append("image", file);
+
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${key}`, { method: "POST", body });
+  const json = await res.json();
+  if (!res.ok || !json?.success) throw new Error(json?.error?.message || "Image upload failed");
+  return json.data.url;
+}
+
+const Field = ({ label, htmlFor, icon: Icon, error, children }) => (
+  <div>
+    <label htmlFor={htmlFor} className="block text-sm font-semibold mb-1.5" style={{ color: "var(--k-text)" }}>
+      {label}
+    </label>
+    <div className="relative">
+      <Icon
+        aria-hidden="true"
+        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg pointer-events-none"
+        style={{ color: "var(--k-muted)" }}
+      />
+      {children}
+    </div>
+    {error && (
+      <p role="alert" className="mt-1.5 text-xs font-medium" style={{ color: "var(--k-brand)" }}>
+        {error}
+      </p>
+    )}
+  </div>
+);
 
 const SignUpPage = () => {
   const router = useRouter();
+
+  const [values, setValues] = useState({ name: "", email: "", password: "" });
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // avatar (hosted on imgbb)
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setValues((v) => ({ ...v, [name]: value }));
+    setErrors((er) => ({ ...er, [name]: undefined }));
+  };
+
+  const pw = values.password;
+  const rules = [
+    { label: "8+ characters", ok: pw.length >= 8 },
+    { label: "1 uppercase letter", ok: /[A-Z]/.test(pw) },
+    { label: "1 number", ok: /\d/.test(pw) },
+  ];
+
+  const handleAvatar = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErrors((er) => ({ ...er, image: "Please choose an image file." }));
+      return;
+    }
+    if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+      setErrors((er) => ({ ...er, image: `Image must be smaller than ${MAX_IMAGE_MB} MB.` }));
+      return;
+    }
+
+    setErrors((er) => ({ ...er, image: undefined }));
+    setAvatarPreview(URL.createObjectURL(file));
+    setAvatarUrl("");
+    setUploading(true);
+    try {
+      setAvatarUrl(await uploadToImgbb(file));
+    } catch (err) {
+      setAvatarPreview("");
+      setErrors((er) => ({ ...er, image: err.message }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeAvatar = () => {
+    setAvatarPreview("");
+    setAvatarUrl("");
+  };
+
+  const validate = () => {
+    const er = {};
+    if (values.name.trim().length < 2) er.name = "Enter your full name.";
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) er.email = "Enter a valid email address.";
+    if (!rules.every((r) => r.ok)) er.password = "Password does not meet all the requirements.";
+    setErrors(er);
+    return Object.keys(er).length === 0;
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (uploading) return toast.info("Wait for your photo to finish uploading.");
+    if (!validate()) return;
+
     setIsLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    const { name, email, password, image } = data;
-
     try {
-      const { data: user, error } = await authClient.signUp.email({
-        name,
-        email,
-        password,
-        image,
+      const { data, error } = await authClient.signUp.email({
+        name: values.name.trim(),
+        email: values.email.trim().toLowerCase(),
+        password: values.password,
+        image: avatarUrl || undefined,
         callbackURL: "/",
       });
 
-      if (user) {
-        toast.success("Account created successfully! Welcome to khalahobe.");
-        router.push("/");
-      } else if (error) {
-        toast.error(`Sign up failed: ${error.message}`);
+      if (error) {
+        toast.error(error.message || "Sign up failed. Try again.");
+        return;
       }
-    } catch (err) {
-      toast.error("An unexpected error occurred. Please try again.");
+      if (data) {
+        toast.success("Account created. Welcome to Khalahobe!");
+        router.push("/");
+        router.refresh();
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/",
-    });
+  const handleGoogle = async () => {
+    try {
+      await authClient.signIn.social({ provider: "google", callbackURL: "/" });
+    } catch {
+      toast.error("Google sign up is unavailable right now.");
+    }
   };
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-[#07090e] p-4 md:p-8 transition-colors">
-      {/* Main Split Container */}
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/90 backdrop-blur-xl">
-        
-        {/* --- LEFT COLUMN: BRAND HERO BANNER --- */}
-        <div className="hidden lg:flex lg:col-span-6 relative bg-gradient-to-br from-[#0c0f17] via-[#121624] to-[#07090e] p-12 text-white flex-col justify-between overflow-hidden border-r border-slate-800">
-          
-          {/* Ambient Glowing Orbs */}
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#ec0000]/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#ec5300]/15 rounded-full blur-3xl pointer-events-none" />
+  const initials = values.name.trim().split(" ").filter(Boolean).slice(0, 2).map((n) => n[0]).join("").toUpperCase();
 
-          {/* Top Tagline */}
-          <div className="relative z-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#ec0000]/20 border border-[#ec0000]/40 text-[#ec5300]">
-              <StarFill className="w-3 h-3 text-[#ecca00]" />
-              Join Khalahobe Sports Community
+  return (
+    <main
+      className="min-h-screen w-full flex items-center justify-center p-4 md:p-8"
+      style={{ background: "var(--k-bg)" }}
+    >
+      <div
+        className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden shadow-2xl border"
+        style={{ background: "var(--k-surface)", borderColor: "var(--k-border)" }}
+      >
+        {/* ---------- Left: brand panel ---------- */}
+        <aside className="hidden lg:flex lg:col-span-5 relative flex-col justify-between p-12 text-white overflow-hidden bg-[#0f0f12]">
+          <div
+            aria-hidden="true"
+            className="absolute -top-28 -left-24 w-96 h-96 rounded-full blur-3xl opacity-40"
+            style={{ background: "var(--k-gradient)" }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -bottom-32 -right-24 w-96 h-96 rounded-full blur-3xl opacity-25"
+            style={{ background: "var(--k-gradient)" }}
+          />
+
+          <Link href="/" className="relative z-10 flex items-center gap-3 w-fit" aria-label="Khalahobe home">
+            <span
+              className="relative w-10 h-10 rounded-xl overflow-hidden p-1.5 shadow-lg"
+              style={{ background: "var(--k-gradient)" }}
+            >
+              <Image src="/khela-hobe.png" alt="" width={40} height={40} className="w-full h-full object-contain" />
+            </span>
+            <span className="text-xl font-extrabold tracking-tight">Khalahobe</span>
+          </Link>
+
+          <div className="relative z-10 my-12">
+            <h2 className="text-4xl font-black leading-[1.1] tracking-tight">
+              Your next game starts with a{" "}
+              <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--k-gradient)" }}>
+                free account.
+              </span>
+            </h2>
+
+            <ul className="mt-10 space-y-6">
+              {highlights.map((h) => (
+                <li key={h.title} className="flex gap-4">
+                  <span
+                    aria-hidden="true"
+                    className="mt-1 w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ background: "var(--k-amber)" }}
+                  />
+                  <div>
+                    <p className="font-bold">{h.title}</p>
+                    <p className="text-sm text-white/65 mt-0.5 max-w-xs">{h.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p className="relative z-10 text-xs text-white/50">Football, cricket, badminton and more, all bookable online.</p>
+        </aside>
+
+        {/* ---------- Right: form ---------- */}
+        <section className="lg:col-span-7 p-6 sm:p-10 md:p-14">
+          <div className="lg:hidden flex items-center gap-2.5 mb-8">
+            <span
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black"
+              style={{ background: "var(--k-gradient)" }}
+              aria-hidden="true"
+            >
+              K
+            </span>
+            <span className="text-lg font-extrabold" style={{ color: "var(--k-text)" }}>
+              Khalahobe
             </span>
           </div>
 
-          {/* Hero Content / Quote */}
-          <div className="relative z-10 space-y-6 my-auto">
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-              Create Your Account & <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ec0000] via-[#ec5300] to-[#ecca00]">Book Ground Slots</span> Instantly
-            </h2>
+          <h1 className="text-3xl font-black tracking-tight" style={{ color: "var(--k-text)" }}>
+            Create your account
+          </h1>
+          <p className="mt-2 text-sm" style={{ color: "var(--k-muted)" }}>
+            It takes less than a minute. No payment needed to sign up.
+          </p>
 
-            <blockquote className="border-l-2 border-[#ec0000] pl-4 text-slate-300 text-sm leading-relaxed italic">
-              "Signing up took less than 30 seconds. Now my team can reserve our favorite football turf and pay online without long delay!"
-            </blockquote>
+          <form onSubmit={onSubmit} noValidate className="mt-8 space-y-5">
+            {/* Avatar upload */}
+            <div className="flex items-center gap-4">
+              <div
+                className="relative w-20 h-20 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white font-black text-xl"
+                style={{ background: "var(--k-gradient)" }}
+              >
+                {avatarPreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatarPreview} alt="Your profile preview" className="w-full h-full object-cover" />
+                ) : (
+                  initials || <HiOutlineUser aria-hidden="true" />
+                )}
+                {uploading && (
+                  <span className="absolute inset-0 bg-black/55 flex items-center justify-center text-[11px] font-semibold">
+                    Uploading
+                  </span>
+                )}
+              </div>
 
-            {/* Testimonial User */}
-            <div className="flex items-center gap-3 pt-2">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#ec0000] to-[#ecca00] p-[2px]">
-                <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center font-bold text-xs text-[#ec5300]">
-                  RA
+              <div className="min-w-0">
+                <p className="text-sm font-semibold" style={{ color: "var(--k-text)" }}>
+                  Profile photo <span style={{ color: "var(--k-muted)" }} className="font-normal">(optional)</span>
+                </p>
+                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                  <label
+                    htmlFor="avatar"
+                    className="cursor-pointer px-3.5 py-1.5 rounded-lg text-xs font-bold border transition-colors hover:bg-[var(--k-surface-2)] focus-within:ring-2"
+                    style={{ borderColor: "var(--k-border)", color: "var(--k-text)" }}
+                  >
+                    {avatarPreview ? "Change photo" : "Upload photo"}
+                  </label>
+                  <input id="avatar" type="file" accept="image/*" onChange={handleAvatar} className="sr-only" />
+                  {avatarPreview && !uploading && (
+                    <button
+                      type="button"
+                      onClick={removeAvatar}
+                      className="text-xs font-semibold underline underline-offset-2"
+                      style={{ color: "var(--k-brand)" }}
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Rahim Ahmed</h4>
-                <p className="text-xs text-slate-400">Futsal League Admin & Player</p>
+                {errors.image ? (
+                  <p role="alert" className="mt-1.5 text-xs font-medium" style={{ color: "var(--k-brand)" }}>
+                    {errors.image}
+                  </p>
+                ) : (
+                  <p className="mt-1.5 text-xs" style={{ color: "var(--k-muted)" }}>
+                    JPG, PNG or WebP, up to {MAX_IMAGE_MB} MB.
+                  </p>
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Footer Partner Logos Section */}
-          <div className="relative z-10 pt-8 border-t border-slate-800/80">
-            <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-4">
-              TRUSTED BY 10K+ PLAYERS & VENUES
-            </p>
-            <div className="grid grid-cols-4 gap-4 items-center opacity-60 text-xs font-bold text-slate-300">
-              <span>⚽ FUTSAL PRO</span>
-              <span>🏏 CRICKET HQ</span>
-              <span>🎾 PADEL HUB</span>
-              <span>🏀 HOOP ARENA</span>
-            </div>
-          </div>
+            <Field label="Full name" htmlFor="name" icon={HiOutlineUser} error={errors.name}>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                value={values.name}
+                onChange={onChange}
+                placeholder="Rahim Ahmed"
+                className={inputClass}
+                style={fieldStyle}
+              />
+            </Field>
 
-        </div>
+            <Field label="Email" htmlFor="email" icon={HiOutlineMail} error={errors.email}>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={values.email}
+                onChange={onChange}
+                placeholder="you@example.com"
+                className={inputClass}
+                style={fieldStyle}
+              />
+            </Field>
 
-        {/* --- RIGHT COLUMN: AUTH FORM --- */}
-        <div className="lg:col-span-6 p-8 sm:p-12 md:p-16 flex flex-col justify-between">
-          <div>
-            {/* Logo & Brand Header */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-gradient-to-br from-[#ec0000] to-[#ec5300] p-1 shadow-md shadow-[#ec0000]/20">
-                <Image
-                  src="/khela-hobe.png"
-                  alt="Khela Hobe Logo"
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-contain filter brightness-200"
+            <div>
+              <Field label="Password" htmlFor="password" icon={HiOutlineLockClosed} error={errors.password}>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={values.password}
+                  onChange={onChange}
+                  placeholder="Create a password"
+                  className={`${inputClass} pr-11`}
+                  style={fieldStyle}
                 />
-              </div>
-              <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                khalahobe
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md"
+                  style={{ color: "var(--k-muted)" }}
+                >
+                  {showPassword ? <HiOutlineEyeOff className="text-lg" /> : <HiOutlineEye className="text-lg" />}
+                </button>
+              </Field>
+
+              <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1" aria-label="Password requirements">
+                {rules.map((r) => (
+                  <li
+                    key={r.label}
+                    className="text-xs font-medium flex items-center gap-1.5"
+                    style={{ color: r.ok ? "var(--k-text)" : "var(--k-muted)" }}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] text-white"
+                      style={{ background: r.ok ? "#16a34a" : "var(--k-border)" }}
+                    >
+                      {r.ok ? "✓" : ""}
+                    </span>
+                    {r.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading || uploading}
+              className="w-full h-12 rounded-xl text-sm font-bold text-white shadow-lg transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: "var(--k-gradient)" }}
+            >
+              {isLoading ? "Creating account…" : uploading ? "Uploading photo…" : "Create account"}
+            </button>
+          </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+              <div className="w-full border-t" style={{ borderColor: "var(--k-border)" }} />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="px-3 text-xs" style={{ background: "var(--k-surface)", color: "var(--k-muted)" }}>
+                or continue with
               </span>
             </div>
-
-            {/* Welcome Heading */}
-            <div className="mb-6">
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Create an Account
-              </h1>
-              <p className="mt-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                Welcome to our sports community! Fill in the details to start booking venues.
-              </p>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={onSubmit} className="space-y-4">
-              {/* Full Name Input */}
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <UserIcon className="text-lg" />
-                  </div>
-                  <input
-                    required
-                    name="name"
-                    type="text"
-                    placeholder="Enter your full name"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#ec0000] focus:ring-1 focus:ring-[#ec0000] transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Avatar URL Input (Optional) */}
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Profile Image URL <span className="text-slate-400 font-normal">(Optional)</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <PhotoIcon className="text-lg" />
-                  </div>
-                  <input
-                    name="image"
-                    type="url"
-                    placeholder="https://example.com/avatar.jpg"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#ec0000] focus:ring-1 focus:ring-[#ec0000] transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Email Input */}
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Email
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <MailIcon className="text-lg" />
-                  </div>
-                  <input
-                    required
-                    name="email"
-                    type="email"
-                    placeholder="john@example.com"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#ec0000] focus:ring-1 focus:ring-[#ec0000] transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Password Input */}
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <LockIcon className="text-lg" />
-                  </div>
-                  <input
-                    required
-                    minLength={8}
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
-                    className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#ec0000] focus:ring-1 focus:ring-[#ec0000] transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                  >
-                    {showPassword ? (
-                      <HiOutlineEyeOff className="text-lg" />
-                    ) : (
-                      <HiOutlineEye className="text-lg" />
-                    )}
-                  </button>
-                </div>
-                <p className="text-[11px] text-slate-400 pt-0.5">
-                  Must be at least 8 characters with 1 uppercase letter and 1 number.
-                </p>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-[#ec0000] via-[#ec2400] to-[#ec5300] text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg shadow-[#ec0000]/25 hover:shadow-xl hover:shadow-[#ec0000]/35 active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70"
-              >
-                {isLoading ? "Creating Account..." : "Sign Up"}
-              </button>
-            </form>
-
-            {/* Divider */}
-            <div className="relative my-5">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200 dark:border-slate-800" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-slate-900 px-3 text-slate-400 font-bold tracking-wider">
-                  OR
-                </span>
-              </div>
-            </div>
-
-            {/* Social Logins */}
-            <div className="space-y-2.5">
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className="w-full py-2.5 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all flex items-center justify-center gap-2.5 shadow-sm"
-              >
-                <FcGoogle className="text-xl" />
-                <span>Sign Up with Google</span>
-              </button>
-
-              <button
-                type="button"
-                className="w-full py-2.5 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all flex items-center justify-center gap-2.5 shadow-sm"
-              >
-                <FaApple className="text-xl text-slate-900 dark:text-white" />
-                <span>Sign Up with Apple</span>
-              </button>
-            </div>
           </div>
 
-          {/* Footer Link */}
-          <div className="mt-6 text-center text-xs text-slate-500">
-            Already have an Account?{" "}
-            <Link
-              href="/login"
-              className="font-bold text-[#ec0000] hover:text-[#ec5300] hover:underline"
-            >
-              Sign In
+          <button
+            type="button"
+            onClick={handleGoogle}
+            className="w-full h-12 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2.5 transition-colors hover:bg-[var(--k-surface-2)]"
+            style={{ borderColor: "var(--k-border)", color: "var(--k-text)", background: "var(--k-surface)" }}
+          >
+            <FcGoogle className="text-xl" />
+            Sign up with Google
+          </button>
+
+          <p className="mt-7 text-center text-sm" style={{ color: "var(--k-muted)" }}>
+            Already have an account?{" "}
+            <Link href="/login" className="font-bold hover:underline underline-offset-4" style={{ color: "var(--k-brand)" }}>
+              Sign in
             </Link>
-          </div>
-        </div>
-
+          </p>
+        </section>
       </div>
-    </div>
+    </main>
   );
 };
 

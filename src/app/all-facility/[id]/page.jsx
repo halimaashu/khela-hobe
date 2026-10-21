@@ -1,217 +1,230 @@
-import BookingCard from "@/components/BookingCard";
+import Link from "next/link";
+import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import BookingCard from "@/components/BookingCard";
+import { OwnerActions, SafeImg } from "@/components/DetailClientParts";
 import {
   ArrowLeft,
-  LocationPin,
-  Clock,
-  TrashBin,
-  PencilToSquare,
-  StarFill,
-  ShieldCheck,
-  CircleCheckFill,
   LocationArrowFill,
+  Clock,
+  Persons,
+  Receipt,
 } from "@gravity-ui/icons";
-import { headers } from "next/headers";
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+
+// Handles old records where available_slots was saved as a string
+const normalizeSlots = (slots) => {
+  if (Array.isArray(slots)) return slots.filter(Boolean);
+  if (typeof slots === "string") {
+    return slots.split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/featured/${id}`, {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const f = await res.json();
+      return {
+        title: f.name,
+        description: (f.description || "").slice(0, 155),
+        openGraph: { title: f.name, images: f.thumbnail?.startsWith("http") ? [f.thumbnail] : [] },
+      };
+    }
+  } catch {}
+  return { title: "Facility details" };
+}
 
 const DetailPage = async ({ params }) => {
   const { id } = await params;
-  
-  // Safe token retrieval
+  const reqHeaders = await headers();
+
+  // Session + token (both optional: guests can still view the page)
+  let user = null;
   let token = "";
   try {
-    const sessionToken = await auth.api.getToken({ headers: await headers() });
-    token = sessionToken?.token || "";
+    const session = await auth.api.getSession({ headers: reqHeaders });
+    user = session?.user || null;
   } catch (err) {
-    console.error("Session token error:", err);
+    console.error("Session error:", err);
   }
+  try {
+    const t = await auth.api.getToken({ headers: reqHeaders });
+    token = t?.token || "";
+  } catch {}
 
   let data = null;
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/featured/${id}`,
-      {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      }
-    );
-    if (res.ok) {
-      data = await res.json();
-    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/featured/${id}`, {
+      headers: token ? { authorization: `Bearer ${token}` } : {},
+      cache: "no-store",
+    });
+    if (res.ok) data = await res.json();
   } catch (error) {
     console.error("Error fetching facility details:", error);
   }
 
   if (!data) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6 bg-slate-50 dark:bg-[#07090e]">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
-          Facility Not Found
-        </h2>
-        <p className="text-slate-500 text-sm mb-6">
-          The venue you are looking for might have been moved or deleted.
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6">
+        <h1 className="text-2xl font-extrabold mb-2" style={{ color: "var(--k-text)" }}>
+          Facility not found
+        </h1>
+        <p className="text-sm mb-6 max-w-sm" style={{ color: "var(--k-muted)" }}>
+          This facility may have been removed, or the link is wrong.
         </p>
-        <Link href="/all-facility">
-          <button className="px-5 py-2.5 bg-[#ec0000] text-white text-xs font-bold rounded-xl flex items-center gap-2">
-            <ArrowLeft className="text-sm" /> Back to Facilities
-          </button>
+        <Link
+          href="/all-facility"
+          className="px-5 py-2.5 rounded-xl text-sm font-bold text-white inline-flex items-center gap-2"
+          style={{ background: "var(--k-gradient)" }}
+        >
+          <ArrowLeft /> Back to facilities
         </Link>
       </div>
     );
   }
 
+  const facility = { ...data, available_slots: normalizeSlots(data.available_slots) };
   const {
-    name = "Premium Turf Arena",
-    thumbnail = "/placeholder-turf.jpg",
-    location = "Dhaka, Bangladesh",
-    description = "State-of-the-art facility equipped with professional lighting, FIFA-certified turf, and full amenities.",
-    available_slots = [],
-    price = "৳ 1,200 / hr",
-    rating = 4.9,
-    facility_type = "Football & Futsal",
-  } = data;
+    name,
+    thumbnail,
+    location,
+    description,
+    available_slots,
+    facility_type,
+    capacity,
+    booking_count,
+    owner_email,
+  } = facility;
+
+  const price = Number(facility.price_per_hour);
+  const isOwner = !!user?.email && user.email.toLowerCase() === (owner_email || "").toLowerCase();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#07090e] text-slate-800 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 transition-colors">
+    <div className="px-4 sm:px-6 lg:px-8 py-8" style={{ background: "var(--k-bg)" }}>
       <div className="max-w-7xl mx-auto space-y-6">
-        
-        {/* --- TOP NAVIGATION BAR --- */}
-        <div className="flex items-center justify-between">
-          <Link href="/all-facility">
-            <button className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-[#ec0000] dark:hover:text-[#ec5300] hover:border-[#ec0000]/30 shadow-sm transition-all">
-              <ArrowLeft className="text-base group-hover:-translate-x-1 transition-transform" />
-              <span>Back to Facilities</span>
-            </button>
+        {/* Top bar */}
+        <div className="flex items-center justify-between gap-3">
+          <Link
+            href="/all-facility"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-colors hover:bg-[var(--k-surface-2)]"
+            style={{ borderColor: "var(--k-border)", color: "var(--k-text)", background: "var(--k-surface)" }}
+          >
+            <ArrowLeft /> Back to facilities
           </Link>
 
-          {/* Admin Management Actions */}
-          <div className="flex items-center gap-2">
-            <button className="px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#ec0000] text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5">
-              <PencilToSquare className="text-sm" />
-              <span className="hidden sm:inline">Edit Facility</span>
-            </button>
-            <button className="px-3.5 py-2 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5">
-              <TrashBin className="text-sm" />
-              <span className="hidden sm:inline">Delete</span>
-            </button>
-          </div>
+          {isOwner && <OwnerActions id={String(facility._id)} />}
         </div>
 
-        {/* --- MAIN HERO CONTENT SECTION --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* LEFT 7 COLS: VENUE DETAILS & GALLERY */}
+          {/* Left column */}
           <div className="lg:col-span-7 space-y-6">
-            
-            {/* Image Box */}
-            <div className="relative w-full aspect-[16/10] rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-200 dark:bg-slate-900">
-              <Image
+            <div
+              className="relative w-full aspect-[16/10] rounded-3xl overflow-hidden border shadow-xl"
+              style={{ borderColor: "var(--k-border)", background: "var(--k-surface-2)" }}
+            >
+              <SafeImg
                 src={thumbnail}
                 alt={name}
-                fill
-                priority
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              
-              {/* Badges Over Image */}
-              <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-md text-white border border-white/20 flex items-center gap-1.5">
-                  <ShieldCheck className="text-emerald-400 text-sm" />
-                  Verified Venue
-                </span>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#ec0000] text-white shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
+              {facility_type && (
+                <span
+                  className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg"
+                  style={{ background: "var(--k-brand)" }}
+                >
                   {facility_type}
                 </span>
-              </div>
-
-              {/* Price & Title Banner over Bottom Image */}
-              <div className="absolute bottom-4 left-4 right-4 z-10 text-white">
-                <p className="text-xs font-semibold text-amber-300 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <StarFill className="text-amber-400 text-xs" /> {rating} Rating
-                </p>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight drop-shadow-md">
-                  {name}
-                </h1>
-              </div>
+              )}
+              <h1 className="absolute bottom-5 left-5 right-5 text-2xl sm:text-4xl font-black tracking-tight text-white drop-shadow">
+                {name}
+              </h1>
             </div>
 
-            {/* Location & Overview Card */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-3">
-                <LocationArrowFill className="text-lg text-[#ec0000] shrink-0" />
+            {/* Overview */}
+            <div
+              className="p-6 rounded-3xl border space-y-5"
+              style={{ background: "var(--k-surface)", borderColor: "var(--k-border)" }}
+            >
+              <div className="flex items-start gap-2 text-sm font-medium" style={{ color: "var(--k-muted)" }}>
+                <LocationArrowFill className="text-lg shrink-0 mt-0.5" style={{ color: "var(--k-brand)" }} />
                 <span>{location}</span>
               </div>
 
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-2">
-                  About This Facility
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {description}
-                </p>
-              </div>
+              <dl className="grid grid-cols-3 gap-3">
+                {[
+                  { icon: Receipt, label: "Price", value: Number.isFinite(price) ? `৳${price.toLocaleString()}/hr` : "Ask owner" },
+                  { icon: Persons, label: "Capacity", value: capacity ? `${capacity} players` : "Not listed" },
+                  { icon: Clock, label: "Bookings", value: Number.isFinite(Number(booking_count)) ? Number(booking_count).toLocaleString() : "0" },
+                ].map(({ icon: Icon, label, value }) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl p-3.5"
+                    style={{ background: "var(--k-surface-2)" }}
+                  >
+                    <dt className="text-xs flex items-center gap-1.5" style={{ color: "var(--k-muted)" }}>
+                      <Icon style={{ color: "var(--k-brand)" }} /> {label}
+                    </dt>
+                    <dd className="mt-1 text-sm sm:text-base font-extrabold" style={{ color: "var(--k-text)" }}>
+                      {value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
 
-              {/* Facility Highlights Pill Badges */}
-              <div className="pt-2 flex flex-wrap gap-2 text-xs font-semibold">
-                <span className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                  <CircleCheckFill className="text-emerald-500 text-sm" /> Floodlights Available
-                </span>
-                <span className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                  <CircleCheckFill className="text-emerald-500 text-sm" /> Changing Rooms
-                </span>
-                <span className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                  <CircleCheckFill className="text-emerald-500 text-sm" /> Free Parking
-                </span>
+              <div>
+                <h2 className="text-base font-extrabold mb-2" style={{ color: "var(--k-text)" }}>
+                  About this facility
+                </h2>
+                <p className="text-sm leading-relaxed max-w-prose" style={{ color: "var(--k-muted)" }}>
+                  {description || "The owner has not added a description yet."}
+                </p>
               </div>
             </div>
 
-            {/* Available Slot Chips Grid */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
-                  <Clock className="text-[#ec5300] text-base" />
-                  <span>Available Slot Schedule</span>
-                </h3>
-                <span className="text-xs text-slate-400 font-medium">
-                  {available_slots.length} Slots Open
+            {/* Read-only hours */}
+            <div
+              className="p-6 rounded-3xl border"
+              style={{ background: "var(--k-surface)", borderColor: "var(--k-border)" }}
+            >
+              <div className="flex items-baseline justify-between gap-3 mb-3">
+                <h2 className="text-base font-extrabold" style={{ color: "var(--k-text)" }}>
+                  Daily hours
+                </h2>
+                <span className="text-xs" style={{ color: "var(--k-muted)" }}>
+                  Choose your slot in the booking panel
                 </span>
               </div>
 
               {available_slots.length === 0 ? (
-                <p className="text-xs text-slate-400 italic py-2">
-                  No open slots found for today.
+                <p className="text-sm" style={{ color: "var(--k-muted)" }}>
+                  The owner has not added any time slots yet.
                 </p>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {available_slots.map((slot, index) => (
-                    <div
-                      key={index}
-                      className="px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 hover:border-[#ec0000] hover:text-[#ec0000] transition-colors cursor-pointer"
+                <ul className="flex flex-wrap gap-2">
+                  {available_slots.map((slot) => (
+                    <li
+                      key={slot}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold"
+                      style={{ background: "var(--k-surface-2)", color: "var(--k-text)" }}
                     >
-                      <Clock className="text-xs text-[#ec2400]" />
-                      <span>{slot}</span>
-                    </div>
+                      {slot}
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
-
           </div>
 
-          {/* RIGHT 5 COLS: STICKY BOOKING CARD */}
-          <div className="lg:col-span-5 lg:sticky lg:top-8">
-            <div className="rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
-              <BookingCard data={data} />
-            </div>
+          {/* Right column: booking */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
+            <BookingCard data={facility} user={user ? { name: user.name, email: user.email } : null} />
           </div>
-
         </div>
-
       </div>
     </div>
   );

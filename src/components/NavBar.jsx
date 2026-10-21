@@ -1,11 +1,8 @@
 import { getUserData } from "@/lib/getUserData";
-import { NavBarView } from "./NavBarView";
-import React from "react";
+import NavBarView from "./NavBarView";
 
 const NavBar = async () => {
-  // Fetching Server Data cleanly without dealing with Client DOM State conflicts
   const user = await getUserData();
-
   return <NavBarView user={user} />;
 };
 

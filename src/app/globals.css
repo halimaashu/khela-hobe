@@ -3,8 +3,38 @@
 @plugin "daisyui";
 
 
+
+
+
 :root {
- 
-  --accent: oklch(0.7 0.25 260);
-  --success: oklch(0.65 0.15 155);
+  --k-bg: #fbf9f6;
+  --k-surface: #ffffff;
+  --k-surface-2: #f3efe9;
+  --k-text: #18181c;
+  --k-muted: #6b6b76;
+  --k-border: #e7e2da;
+  --k-brand: #ec0000;
+  --k-brand-hover: #ec2400;
+  --k-orange: #ec5300;
+  --k-amber: #ec9b00;
+  --k-yellow: #ecca00;
+  --k-gradient: linear-gradient(90deg, #ec0000, #ec5300 50%, #ec9b00);
+}
+
+.dark {
+  --k-bg: #0f0f12;
+  --k-surface: #18181c;
+  --k-surface-2: #23232a;
+  --k-text: #f5f3ef;
+  --k-muted: #a1a1ad;
+  --k-border: #2c2c35;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+:focus-visible {
+  outline: 2px solid var(--k-brand);
+  outline-offset: 2px;
 }
